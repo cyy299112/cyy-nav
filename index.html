@@ -2,61 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>CYY工具集</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>CYY Tool Collection</title>
 <style>
-body { font-family: sans-serif; margin: 0; padding: 0; }
-.sidebar { width: 260px; background: white; border-right: 1px solid #e5e7eb; height: 100vh; position: fixed; left: 0; top: 0; padding: 20px; }
-.main { margin-left: 260px; padding: 40px; }
-h2 { color: #0052FF; margin-top: 30px; }
-.card { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 8px 0; text-decoration: none; color: #333; }
-.card:hover { border-color: #0052FF; }
-.logo { width: 36px; height: 36px; border-radius: 8px; background: #f1f5f9; }
-.name { font-weight: 600; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f8fafc; }
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: white; border-right: 1px solid #e5e7eb; padding: 24px 16px; }
+.logo { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 20px; display: block; text-decoration: none; }
+.logo span { color: #0052FF; }
+.main { margin-left: 240px; padding: 32px; }
+h2 { font-size: 16px; color: #0052FF; margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+.card { display: flex; align-items: center; gap: 12px; padding: 14px 12px; background: white; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; text-decoration: none; transition: all 0.2s; }
+.card:hover { border-color: #0052FF; box-shadow: 0 2px 8px rgba(0,82,255,0.1); transform: translateY(-1px); }
+.logo-img { width: 32px; height: 32px; border-radius: 6px; background: #f1f5f9; flex-shrink: 0; }
+.card-title { font-size: 14px; font-weight: 500; color: #1e293b; }
 </style>
 </head>
 <body>
-<div class="sidebar">
-  <h2>CYY工具集</h2>
-  <p id="cat-list"></p>
-</div>
-<div class="main">
-  <h1>AI工具导航</h1>
-  <div id="content"></div>
-</div>
-<script>
-var bookmarksData = [{"category": "AI对话", "title": "ChatGPT", "url": "https://chat.openai.com", "logo": "https://www.google.com/s2/favicons?domain=chat.openai.com&sz=64", "tags": ["AI", "对话"]}, {"category": "AI对话", "title": "Claude", "url": "https://claude.ai", "logo": "https://www.google.com/s2/favicons?domain=claude.ai&sz=64", "tags": ["AI", "对话"]}, {"category": "AI绘画", "title": "Midjourney", "url": "https://midjourney.com", "logo": "https://www.google.com/s2/favicons?domain=midjourney.com&sz=64", "tags": ["AI", "绘画"]}, {"category": "效率工具", "title": "Notion", "url": "https://notion.so", "logo": "https://www.google.com/s2/favicons?domain=notion.so&sz=64", "tags": ["效率", "笔记"]}];
+<aside class="sidebar">
+<a href="#" class="logo">CYY <span>Tool</span></a>
+</aside>
+<main class="main">
+<h1 style="font-size:24px;color:#1e293b;margin-bottom:8px;">AI Tools</h1>
+<p style="color:#64748B;font-size:14px;">Bookmark Navigation</p>
 
-var CAT_ORDER = ["AI对话", "AI绘画", "AI应用", "设计素材", "设计工具", "效率工具", "数据分析", "常用工具", "企业内部", "学习资源", "参考导航", "其他"];
+<h2>AI Chat</h2>
+<a href="https://chat.openai.com" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=openai.com&sz=64" alt="">
+<span class="card-title">ChatGPT</span>
+</a>
+<a href="https://claude.ai" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=claude.ai&sz=64" alt="">
+<span class="card-title">Claude</span>
+</a>
+<a href="https://gemini.google.com" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="">
+<span class="card-title">Google Gemini</span>
+</a>
 
-// 渲染分类导航
-var cats = {};
-bookmarksData.forEach(function(b) { cats[b.category] = (cats[b.category] || 0) + 1; });
-var catHtml = "";
-CAT_ORDER.forEach(function(c) {
-  if (cats[c]) catHtml += c + " (" + cats[c] + ") ";
-});
-document.getElementById("cat-list").innerHTML = catHtml || "无分类";
+<h2>AI Image</h2>
+<a href="https://midjourney.com" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=midjourney.com&sz=64" alt="">
+<span class="card-title">Midjourney</span>
+</a>
+<a href="https://stability.ai" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=stability.ai&sz=64" alt="">
+<span class="card-title">Stable Diffusion</span>
+</a>
 
-// 渲染内容
-var grouped = {};
-bookmarksData.forEach(function(b) {
-  if (!grouped[b.category]) grouped[b.category] = [];
-  grouped[b.category].push(b);
-});
+<h2>Tools</h2>
+<a href="https://notion.so" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=notion.so&sz=64" alt="">
+<span class="card-title">Notion</span>
+</a>
+<a href="https://figma.com" target="_blank" class="card">
+<img class="logo-img" src="https://www.google.com/s2/favicons?domain=figma.com&sz=64" alt="">
+<span class="card-title">Figma</span>
+</a>
 
-var html = "";
-CAT_ORDER.forEach(function(cat) {
-  if (!grouped[cat]) return;
-  html += "<h2>" + cat + "</h2>";
-  grouped[cat].forEach(function(bm) {
-    html += '<a href="' + bm.url + '" target="_blank" class="card">';
-    html += '<img class="logo" src="' + bm.logo + '" onerror="this.style.background=\'#e2e8f0\'">';
-    html += '<span class="name">' + bm.title + '</span>';
-    html += '</a>';
-  });
-});
-
-document.getElementById("content").innerHTML = html || "<p>没有书签</p>";
-</script>
+</main>
 </body>
 </html>
