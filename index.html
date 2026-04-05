@@ -63,59 +63,29 @@
     .card-tags { display: flex; gap: 6px; margin-top: 6px; }
     .card-tag { font-size: 11px; color: #64748B; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
     
-    #drop-zone { position: fixed; bottom: 20px; right: 20px; width: 64px; height: 64px; background: linear-gradient(135deg, #0052FF, #4D7CFF); border-radius: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 20px rgba(0,82,255,0.4); transition: all 0.3s; z-index: 100; }
-    #drop-zone:hover { transform: scale(1.1); box-shadow: 0 8px 32px rgba(0,82,255,0.5); }
-    #drop-zone.drag-over { transform: scale(1.2); background: #003ecc; }
-    #drop-zone svg { width: 28px; height: 28px; color: #fff; }
+    /* 右下角按钮组 */
+    .float-btns { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 100; }
+    .float-btn { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .float-btn svg { width: 24px; height: 24px; }
+    .float-btn-add { background: linear-gradient(135deg, #0052FF, #4D7CFF); }
+    .float-btn-add svg { color: #fff; }
+    .float-btn-add:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,82,255,0.4); }
     
-    #drag-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,82,255,0.12); border: 3px dashed #0052FF; z-index: 9998; pointer-events: none; }
-    #drag-overlay.active { display: flex; align-items: center; justify-content: center; }
-    #drag-overlay-text { background: #fff; padding: 24px 40px; border-radius: 16px; font-size: 18px; font-weight: 600; color: #0052FF; box-shadow: 0 8px 32px rgba(0,82,255,0.3); }
+    /* 提示文字 */
+    .hint-bar { position: fixed; bottom: 28px; right: 86px; font-size: 12px; color: #94a3b8; white-space: nowrap; }
     
-    #edit-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; }
-    #edit-modal.active { display: flex; }
-    .modal-content { background: #fff; border-radius: 16px; padding: 30px; width: 420px; max-width: 90vw; }
-    .modal-title { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; color: #64748B; margin-bottom: 6px; }
-    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; }
-    .form-group input:focus, .form-group select:focus { border-color: #0052FF; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-    .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-    .btn-cancel { background: #f1f5f9; color: #64748B; }
-    .btn-cancel:hover { background: #e2e8f0; }
-    .btn-primary { background: linear-gradient(135deg, #0052FF 0%, #4D7CFF 100%); color: #fff; }
-    .btn-primary:hover { opacity: 0.9; }
-    
+    /* Toast */
     .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 99999; opacity: 0; transition: all 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    
-    .shortcut-hint { position: fixed; bottom: 24px; right: 94px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: #64748B; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 100; }
-    .shortcut-hint kbd { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; color: #333; }
   </style>
 </head>
 <body>
-  <div id="drag-overlay"><div id="drag-overlay-text">松开即可添加书签</div></div>
-  
-  <div id="drop-zone" title="拖拽网址到此处添加书签">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </div>
-  <div class="shortcut-hint"><kbd>Ctrl</kbd>+<kbd>V</kbd> 粘贴添加</div>
-
-  <div id="edit-modal">
-    <div class="modal-content">
-      <div class="modal-title">添加书签</div>
-      <div class="form-group"><label>网址</label><input type="url" id="edit-url" placeholder="https://example.com"></div>
-      <div class="form-group"><label>名称</label><input type="text" id="edit-title" placeholder="网站名称"></div>
-      <div class="form-group"><label>分类</label><select id="edit-category"></select></div>
-      <div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="edit-tags" placeholder="如: AI, 工具"></div>
-      <div class="modal-actions">
-        <button class="btn btn-cancel" onclick="closeEdit()">取消</button>
-        <button class="btn btn-primary" onclick="saveEdit()">保存</button>
-      </div>
+  <div class="float-btns">
+    <div class="float-btn float-btn-add" onclick="addBookmark()" title="添加当前页面到书签">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
   </div>
-
+  <div class="hint-bar">点击 + 添加书签</div>
   <div id="toast" class="toast"></div>
 
   <aside class="sidebar">
@@ -141,7 +111,7 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-content">
         <h1 class="hero-title">发现优质<span>AI工具</span>与<span>设计资源</span></h1>
-        <p class="hero-subtitle">1067 个精选网站，拖拽链接或 Ctrl+V 粘贴添加</p>
+        <p class="hero-subtitle">1067 个精选网站 · 点击右下角添加书签</p>
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="搜索网站、工具、资源...">
           <button class="search-btn">搜索</button>
@@ -185,71 +155,37 @@ var searchTerm = "";
 var categoryNav = document.getElementById("categoryNav");
 var mainContent = document.getElementById("mainContent");
 var searchInput = document.getElementById("searchInput");
-var dropZone = document.getElementById("drop-zone");
-var dragOverlay = document.getElementById("drag-overlay");
 
-function extractUrl(dataTransfer) {
-  var url = "";
-  var types = [];
-  try { types = Array.from(dataTransfer.types); } catch(e) {}
+// ====== 添加书签 ======
+function addBookmark() {
+  var url = prompt("请粘贴网址：");
+  if (!url || !url.trim()) return;
+  url = url.trim();
+  if (!url.startsWith("http")) { showToast("请输入有效的网址"); return; }
   
-  if (types.indexOf("text/uri-list") !== -1 || types.indexOf("text/x-moz-url") !== -1) {
-    try { url = dataTransfer.getData("text/uri-list") || dataTransfer.getData("text/x-moz-url"); } catch(e) {}
-    if (url) url = url.split("\n")[0].split("#")[0].trim();
-  }
-  
-  if (!url || !url.startsWith("http")) {
-    try { url = dataTransfer.getData("text/plain"); } catch(e) {}
-    url = (url || "").trim();
-    if (url && !url.startsWith("http")) url = "";
-  }
-  return url;
-}
-
-function openAddDialog(url) {
   var hostname = url;
   try { hostname = new URL(url).hostname.replace("www.", ""); } catch(e) {}
   
-  var select = document.getElementById("edit-category");
-  select.innerHTML = "";
-  CAT_ORDER.forEach(function(c) {
-    var opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    select.appendChild(opt);
-  });
-  select.value = "其他";
+  var title = prompt("网站名称：", hostname);
+  if (!title || !title.trim()) return;
   
-  document.getElementById("edit-url").value = url;
-  document.getElementById("edit-title").value = hostname;
-  document.getElementById("edit-tags").value = "";
-  document.getElementById("edit-modal").classList.add("active");
-  setTimeout(function() { document.getElementById("edit-title").focus(); document.getElementById("edit-title").select(); }, 50);
-}
-
-function closeEdit() { document.getElementById("edit-modal").classList.remove("active"); }
-
-function saveEdit() {
-  var url = document.getElementById("edit-url").value.trim();
-  var title = document.getElementById("edit-title").value.trim();
-  var category = document.getElementById("edit-category").value;
-  var tagsStr = document.getElementById("edit-tags").value.trim();
-  var tags = tagsStr ? tagsStr.split(",").map(function(t) { return t.trim(); }).filter(function(t) { return t; }) : [];
+  // 保存最后输入的网址，便于添加页面获取
+  localStorage.setItem("cyyNav_lastUrl", url);
   
-  if (!url) { showToast("请输入网址"); return; }
-  if (!title) { showToast("请输入名称"); return; }
-  
+  // 直接添加
   var favicon = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(url) + "&sz=64";
-  var newBookmark = { title: title, url: url, logo: favicon, category: category, tags: tags, isCustom: true };
+  var newBookmark = { title: title.trim(), url: url, logo: favicon, category: "其他", tags: [], isCustom: true, addedAt: Date.now() };
   
   var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
+  
+  // 检查是否已存在
+  var exists = customBookmarks.some(function(b) { return b.url === url; });
+  if (exists) { showToast("该网址已在书签中"); return; }
+  
   customBookmarks.unshift(newBookmark);
   localStorage.setItem("cyyNav_customBookmarks", JSON.stringify(customBookmarks));
-  
-  closeEdit();
-  showToast("已添加到「" + category + "」");
+  showToast("已添加！共 " + customBookmarks.length + " 个书签");
   renderCategoryNav();
-  if (currentCat === "all" || currentCat === category) renderContent();
 }
 
 function showToast(msg) {
@@ -258,35 +194,6 @@ function showToast(msg) {
   t.classList.add("show");
   setTimeout(function() { t.classList.remove("show"); }, 2500);
 }
-
-// 粘贴添加
-document.addEventListener("paste", function(e) {
-  var text = (e.clipboardData || window.clipboardData).getData("text").trim();
-  if (text && text.startsWith("http")) openAddDialog(text);
-});
-
-// 点击添加按钮
-dropZone.addEventListener("click", function() {
-  var text = window.prompt("请粘贴网址：");
-  if (text && text.trim().startsWith("http")) openAddDialog(text.trim());
-  else if (text && text.trim()) showToast("不是有效的网址");
-});
-
-// 拖拽处理
-document.addEventListener("dragenter", function(e) { e.preventDefault(); dragOverlay.classList.add("active"); dropZone.classList.add("drag-over"); });
-document.addEventListener("dragleave", function(e) { if (e.target === document.documentElement || e.target === dragOverlay) { dragOverlay.classList.remove("active"); dropZone.classList.remove("drag-over"); } });
-document.addEventListener("dragover", function(e) { e.preventDefault(); });
-document.addEventListener("drop", function(e) {
-  e.preventDefault();
-  dragOverlay.classList.remove("active");
-  dropZone.classList.remove("drag-over");
-  var url = extractUrl(e.dataTransfer);
-  if (url) openAddDialog(url);
-  else showToast("请拖拽有效的网址链接");
-});
-
-// ESC 关闭弹窗
-document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeEdit(); });
 
 function loadBg() {
   var savedBg = localStorage.getItem("cyyNav_heroBg");
