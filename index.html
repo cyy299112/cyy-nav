@@ -19,6 +19,7 @@
     .category-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; cursor: pointer; color: #64748B; transition: all 0.2s; }
     .category-item:hover { background: #f8fafc; color: #333; }
     .category-item.active { background: rgba(0,82,255,.1); color: #0052FF; }
+    .category-item.drop-target { background: rgba(0,82,255,.2) !important; border: 2px dashed #0052FF; }
     .category-item svg { width: 18px; height: 18px; flex-shrink: 0; }
     .category-item span { font-size: 14px; }
     .category-count { margin-left: auto; font-size: 12px; color: #94a3b8; }
@@ -63,18 +64,17 @@
     .card-tags { display: flex; gap: 6px; margin-top: 6px; }
     .card-tag { font-size: 11px; color: #64748B; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
     
-    /* 拖拽上传遮罩 */
-    #drop-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,82,255,0.15); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
-    #drop-overlay.active { display: flex; }
-    .drop-zone { width: 400px; max-width: 90vw; padding: 60px 40px; background: #fff; border-radius: 20px; border: 3px dashed #0052FF; text-align: center; }
-    .drop-zone-icon { width: 64px; height: 64px; background: rgba(0,82,255,0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-    .drop-zone-icon svg { width: 32px; height: 32px; color: #0052FF; }
-    .drop-zone h2 { font-size: 20px; color: #1e293b; margin-bottom: 8px; }
-    .drop-zone p { font-size: 14px; color: #64748B; }
+    /* 拖拽指示器 */
+    #drop-indicator { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,82,255,0.08); border: 3px solid #0052FF; z-index: 9998; pointer-events: none; }
+    #drop-indicator.active { display: block; }
+    #drop-indicator::after { content: '松开即添加到「' attr(data-cat) '」'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #fff; padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 500; color: #0052FF; box-shadow: 0 8px 32px rgba(0,82,255,0.3); white-space: nowrap; }
     
-    /* 添加链接弹窗 */
-    #add-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; }
-    #add-modal.active { display: flex; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 14px; z-index: 99999; transition: transform 0.3s; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    
+    /* 编辑弹窗 */
+    #edit-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center; }
+    #edit-modal.active { display: flex; }
     .modal-content { background: #fff; border-radius: 16px; padding: 30px; width: 420px; max-width: 90vw; }
     .modal-title { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 20px; }
     .form-group { margin-bottom: 16px; }
@@ -87,46 +87,32 @@
     .btn-cancel:hover { background: #e2e8f0; }
     .btn-primary { background: linear-gradient(135deg, #0052FF 0%, #4D7CFF 100%); color: #fff; }
     .btn-primary:hover { opacity: 0.9; }
-    
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 14px; z-index: 99999; transition: transform 0.3s; }
-    .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
-  <!-- 拖拽遮罩 -->
-  <div id="drop-overlay">
-    <div class="drop-zone">
-      <div class="drop-zone-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </div>
-      <h2>拖放链接到这里</h2>
-      <p>从其他网站拖拽任意链接即可快速添加</p>
-    </div>
-  </div>
-
-  <!-- 添加链接弹窗 -->
-  <div id="add-modal">
+  <div id="drop-indicator" data-cat=""></div>
+  <div id="edit-modal">
     <div class="modal-content">
-      <div class="modal-title">添加新链接</div>
+      <div class="modal-title">添加书签</div>
       <div class="form-group">
         <label>网址</label>
-        <input type="url" id="input-url" placeholder="https://example.com">
+        <input type="url" id="edit-url" placeholder="https://example.com">
       </div>
       <div class="form-group">
         <label>名称</label>
-        <input type="text" id="input-title" placeholder="网站名称">
+        <input type="text" id="edit-title" placeholder="网站名称">
       </div>
       <div class="form-group">
         <label>分类</label>
-        <select id="input-category"></select>
+        <select id="edit-category"></select>
       </div>
       <div class="form-group">
         <label>标签（逗号分隔）</label>
-        <input type="text" id="input-tags" placeholder="如: AI, 工具">
+        <input type="text" id="edit-tags" placeholder="如: AI, 工具">
       </div>
       <div class="modal-actions">
-        <button class="btn btn-cancel" onclick="closeModal()">取消</button>
-        <button class="btn btn-primary" onclick="confirmAdd()">添加</button>
+        <button class="btn btn-cancel" onclick="closeEdit()">取消</button>
+        <button class="btn btn-primary" onclick="saveEdit()">保存</button>
       </div>
     </div>
   </div>
@@ -156,7 +142,7 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-content">
         <h1 class="hero-title">发现优质<span>AI工具</span>与<span>设计资源</span></h1>
-        <p class="hero-subtitle">1067 个精选网站，拖拽即可添加新链接</p>
+        <p class="hero-subtitle">1067 个精选网站，拖拽链接即可添加</p>
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="搜索网站、工具、资源...">
           <button class="search-btn">搜索</button>
@@ -196,52 +182,107 @@ var CAT_ICONS = {
 var CAT_ORDER = ["AI\u5bf9\u8bdd", "AI\u7ed8\u753b", "AI\u5e94\u7528", "\u8bbe\u8ba1\u7d20\u6750", "\u8bbe\u8ba1\u5de5\u5177", "\u6548\u7387\u5de5\u5177", "\u6570\u636e\u5206\u6790", "\u5e38\u7528\u5de5\u5177", "\u4f01\u4e1a\u5185\u90e8", "\u5b66\u4e60\u8d44\u6e90", "\u53c2\u8003\u5bfc\u822a", "\u5176\u4ed6"];
 var currentCat = "all";
 var searchTerm = "";
-var pendingUrl = "";
+var pendingBook = null;
+var editingIndex = -1;
 
 var categoryNav = document.getElementById("categoryNav");
 var mainContent = document.getElementById("mainContent");
 var searchInput = document.getElementById("searchInput");
 
-// 拖拽事件
-var dropOverlay = document.getElementById("drop-overlay");
+// ====== 拖拽处理 ======
+var dropIndicator = document.getElementById("drop-indicator");
+var currentDropCat = currentCat;
 
-document.addEventListener("dragenter", function(e) {
-  e.preventDefault();
-  dropOverlay.classList.add("active");
+document.addEventListener("dragstart", function(e) {
+  // 标记为外部拖拽
+  document.body.classList.add("dragging-external");
+});
+
+document.addEventListener("dragend", function(e) {
+  document.body.classList.remove("dragging-external");
+  dropIndicator.classList.remove("active");
+  document.querySelectorAll(".category-item").forEach(function(el) {
+    el.classList.remove("drop-target");
+  });
 });
 
 document.addEventListener("dragover", function(e) {
   e.preventDefault();
+  if (!document.body.classList.contains("dragging-external")) return;
+  
+  dropIndicator.classList.add("active");
+  
+  // 检查是否悬停在分类上
+  var targetCat = currentCat;
+  var catItems = document.querySelectorAll(".category-item");
+  catItems.forEach(function(item) {
+    var rect = item.getBoundingClientRect();
+    if (e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom) {
+      targetCat = item.getAttribute("data-cat") || "全部";
+    }
+  });
+  
+  // 更新指示器
+  if (targetCat !== currentDropCat) {
+    currentDropCat = targetCat;
+    dropIndicator.setAttribute("data-cat", targetCat === "全部" ? "全部书签" : targetCat);
+  }
 });
 
 document.addEventListener("dragleave", function(e) {
-  if (e.target === document.documentElement || e.target === dropOverlay) {
-    dropOverlay.classList.remove("active");
+  if (e.target === document.documentElement) {
+    dropIndicator.classList.remove("active");
   }
 });
 
 document.addEventListener("drop", function(e) {
   e.preventDefault();
-  dropOverlay.classList.remove("active");
+  dropIndicator.classList.remove("active");
+  if (!document.body.classList.contains("dragging-external")) return;
+  document.body.classList.remove("dragging-external");
   
   var url = "";
-  // 尝试从各种数据格式获取 URL
   if (e.dataTransfer.getData("text/uri-list")) {
     url = e.dataTransfer.getData("text/uri-list").split("\n")[0].trim();
   } else if (e.dataTransfer.getData("text/plain")) {
     url = e.dataTransfer.getData("text/plain").trim();
   }
   
-  if (url && url.startsWith("http")) {
-    openAddModal(url);
-  } else {
+  if (!url || !url.startsWith("http")) {
     showToast("请拖拽有效的网址链接");
+    return;
   }
+  
+  // 确定分类
+  var targetCat = currentDropCat !== currentCat ? currentDropCat : (currentCat === "all" ? "其他" : currentCat);
+  if (targetCat === "全部") targetCat = "其他";
+  
+  // 提取域名作为默认名称
+  try {
+    var hostname = new URL(url).hostname.replace("www.", "");
+  } catch(ex) {
+    var hostname = url;
+  }
+  
+  // 打开编辑弹窗预填
+  openEdit({
+    url: url,
+    title: hostname,
+    category: targetCat,
+    tags: []
+  });
 });
 
-// 填充分类下拉框
-function populateCategories() {
-  var select = document.getElementById("input-category");
+// ====== 弹窗编辑 ======
+function openEdit(book) {
+  pendingBook = book;
+  document.getElementById("edit-url").value = book.url || "";
+  document.getElementById("edit-title").value = book.title || "";
+  document.getElementById("edit-tags").value = (book.tags || []).join(", ");
+  
+  // 填充分类
+  var select = document.getElementById("edit-category");
   select.innerHTML = "";
   CAT_ORDER.forEach(function(cat) {
     var opt = document.createElement("option");
@@ -249,40 +290,29 @@ function populateCategories() {
     opt.textContent = cat;
     select.appendChild(opt);
   });
-  // 默认选"其他"
-  select.value = "其他";
+  select.value = book.category || "其他";
+  
+  document.getElementById("edit-modal").classList.add("active");
+  document.getElementById("edit-title").focus();
+  document.getElementById("edit-title").select();
 }
 
-// 打开添加弹窗
-function openAddModal(url) {
-  pendingUrl = url;
-  document.getElementById("input-url").value = url;
-  document.getElementById("input-title").value = "";
-  document.getElementById("input-tags").value = "";
-  document.getElementById("input-category").value = "其他";
-  populateCategories();
-  document.getElementById("add-modal").classList.add("active");
-  document.getElementById("input-title").focus();
+function closeEdit() {
+  document.getElementById("edit-modal").classList.remove("active");
+  pendingBook = null;
+  editingIndex = -1;
 }
 
-// 关闭弹窗
-function closeModal() {
-  document.getElementById("add-modal").classList.remove("active");
-  pendingUrl = "";
-}
-
-// 确认添加
-function confirmAdd() {
-  var url = document.getElementById("input-url").value.trim();
-  var title = document.getElementById("input-title").value.trim();
-  var category = document.getElementById("input-category").value;
-  var tagsStr = document.getElementById("input-tags").value.trim();
+function saveEdit() {
+  var url = document.getElementById("edit-url").value.trim();
+  var title = document.getElementById("edit-title").value.trim();
+  var category = document.getElementById("edit-category").value;
+  var tagsStr = document.getElementById("edit-tags").value.trim();
   var tags = tagsStr ? tagsStr.split(",").map(function(t) { return t.trim(); }).filter(function(t) { return t; }) : [];
   
   if (!url) { showToast("请输入网址"); return; }
   if (!title) { showToast("请输入名称"); return; }
   
-  // 构建 favicon URL
   var favicon = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(url) + "&sz=64";
   
   var newBookmark = {
@@ -290,24 +320,24 @@ function confirmAdd() {
     url: url,
     logo: favicon,
     category: category,
-    tags: tags
+    tags: tags,
+    isCustom: true
   };
   
-  // 保存到 localStorage
   var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
-  customBookmarks.push(newBookmark);
+  customBookmarks.unshift(newBookmark);
   localStorage.setItem("cyyNav_customBookmarks", JSON.stringify(customBookmarks));
   
-  closeModal();
-  showToast("添加成功！");
+  closeEdit();
+  showToast("已添加到「" + category + "」");
   
-  // 如果在"全部"或对应分类视图，自动切换过去
+  // 如果在全部或对应分类，自动刷新视图
   if (currentCat === "all" || currentCat === category) {
     selectCategory(currentCat);
   }
 }
 
-// Toast 提示
+// ====== Toast ======
 function showToast(msg) {
   var toast = document.getElementById("toast");
   toast.textContent = msg;
@@ -315,6 +345,7 @@ function showToast(msg) {
   setTimeout(function() { toast.classList.remove("show"); }, 2500);
 }
 
+// ====== 初始化分类导航 ======
 function loadBg() {
   var savedBg = localStorage.getItem("cyyNav_heroBg");
   var heroBg = document.getElementById("heroBg");
@@ -329,15 +360,15 @@ function loadBg() {
 function renderCategoryNav() {
   var totalCounts = {};
   bookmarksData.forEach(function(b) { totalCounts[b.category] = (totalCounts[b.category] || 0) + 1; });
-  // 加上自定义书签
   var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
   customBookmarks.forEach(function(b) { totalCounts[b.category] = (totalCounts[b.category] || 0) + 1; });
   var total = bookmarksData.length + customBookmarks.length;
-  var html = '<div class="category-item ' + (currentCat==="all"?"active":"") + '" onclick="selectCategory(\'all\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>全部</span><span class="category-count">' + total + "</span></div>";
+  
+  var html = '<div class="category-item ' + (currentCat==="all"?"active":"") + '" data-cat="全部" onclick="selectCategory(\'all\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>全部</span><span class="category-count">' + total + "</span></div>";
   CAT_ORDER.forEach(function(cat) {
     var cnt = totalCounts[cat] || 0;
     if (!cnt) return;
-    html += '<div class="category-item ' + (currentCat===cat?"active":"") + '" onclick="selectCategory(\'' + cat + "\')" + '">' + CAT_ICONS[cat] + "<span>" + cat + "</span><span class=\"category-count\">" + cnt + "</span></div>";
+    html += '<div class="category-item ' + (currentCat===cat?"active":"") + '" data-cat="' + cat + '" onclick="selectCategory(\'' + cat + "\')" + '">' + CAT_ICONS[cat] + "<span>" + cat + "</span><span class=\"category-count\">" + cnt + "</span></div>";
   });
   categoryNav.innerHTML = html;
 }
@@ -350,7 +381,7 @@ function renderContent() {
     var term = searchTerm.toLowerCase();
     filtered = filtered.filter(function(b) { return b.title.toLowerCase().includes(term) || b.url.toLowerCase().includes(term); });
   }
-  if (filtered.length === 0) { mainContent.innerHTML = "<p style='text-align:center;padding:3rem;color:#64748B'>未找到相关内容，试试拖拽添加！</p>"; return; }
+  if (filtered.length === 0) { mainContent.innerHTML = "<p style='text-align:center;padding:3rem;color:#64748B;font-size:15px'>未找到相关内容<br><br><span style='font-size:13px;color:#94a3b8'>💡 从其他网站拖拽链接到这里即可添加书签</span></p>"; return; }
   var grouped = {};
   filtered.forEach(function(b) { if (!grouped[b.category]) grouped[b.category] = []; grouped[b.category].push(b); });
   var html = "";
@@ -366,14 +397,11 @@ function renderContent() {
   mainContent.innerHTML = html;
 }
 
-function selectCategory(cat) { currentCat = cat; renderCategoryNav(); renderContent(); }
+function selectCategory(cat) { currentCat = cat; currentDropCat = cat; renderCategoryNav(); renderContent(); }
 function doSearch(term) { searchInput.value = term; searchTerm = term; renderContent(); }
 searchInput.addEventListener("input", function(e) { searchTerm = e.target.value; renderContent(); });
 
-// ESC 关闭弹窗
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Escape") closeModal();
-});
+document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeEdit(); });
 
 loadBg();
 renderCategoryNav();
