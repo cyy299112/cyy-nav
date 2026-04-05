@@ -7,29 +7,34 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f8fafc}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;overflow-y:auto}
-.sidebar-header{padding:20px}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column}
+.sidebar-header{padding:20px 16px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#333}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#0052FF,#4D7CFF);border-radius:8px;display:flex;align-items:center;justify-content:center}
 .logo-icon svg{width:20px;height:20px}
 .logo span{font-size:16px;font-weight:600;color:#1e293b}
-.category-nav{flex:1;padding:10px 16px;overflow-y:auto}
+.sidebar-footer{padding:12px 16px;border-top:1px solid #e5e7eb}
+.sidebar-action{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#64748B;text-decoration:none;font-size:14px}
+.sidebar-action:hover{background:#f8fafc;color:#333}
+.category-nav{flex:1;padding:8px 16px;overflow-y:auto}
 .category-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:#64748B;transition:all .2s;font-size:14px}
 .category-item:hover{background:#f8fafc;color:#333}
-.category-item.active{background:rgba(0,82,255,.1);color:#0052FF}
+.category-item.active{background:rgba(0,82,255,.1);color:#0052FF;font-weight:500}
 .category-item svg{width:18px;height:18px;flex-shrink:0}
 .category-item span{font-weight:500}
 .category-count{margin-left:auto;font-size:12px;color:#94a3b8}
 .main{margin-left:240px;min-height:100vh;padding-bottom:60px}
 .hero{background:#fff;padding:48px 40px 32px;border-bottom:1px solid #e5e7eb}
+.hero-content{max-width:800px}
 .hero h1{font-size:28px;font-weight:700;color:#1e293b;margin-bottom:8px}
 .hero-subtitle{color:#64748B;font-size:14px;margin-bottom:20px}
-.search-box{display:flex;align-items:center;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:3px 3px 3px 16px;max-width:560px}
+.search-wrapper{display:flex;justify-content:center}
+.search-box{display:flex;align-items:center;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:3px 3px 3px 16px;width:100%;max-width:560px}
 .search-box input{border:none;background:none;outline:none;flex:1;font-size:14px;padding:10px 0}
-.search-box button{background:linear-gradient(135deg,#0052FF,#4D7CFF);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+.search-btn{background:linear-gradient(135deg,#0052FF,#4D7CFF);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
 .main-content{padding:24px 40px}
 .section{margin-bottom:32px}
-.section-title{font-size:16px;font-weight:600;color:#0052FF;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:8px}
+.section-title{font-size:15px;font-weight:600;color:#0052FF;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
 .card{display:flex;align-items:center;gap:10px;padding:12px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;text-decoration:none;transition:all .2s}
 .card:hover{border-color:#0052FF;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
@@ -38,44 +43,60 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .card-name{font-size:13px;color:#1e293b;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-tags{display:flex;gap:4px;margin-top:4px}
 .card-tag{font-size:11px;color:#64748B;background:#f1f5f9;padding:2px 8px;border-radius:4px}
+.hint-text{text-align:center;color:#94a3b8;font-size:13px;padding:2rem}
 
 </style>
 </head>
 <body>
 <aside class="sidebar">
 <div class="sidebar-header">
-<a href="#" class="logo">
+<a href="#" class="logo" onclick="location.reload();return false">
 <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
 <span>CYY工具集</span>
 </a>
 </div>
 <nav class="category-nav">
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>AI对话</span><span class="category-count">73</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>AI绘画</span><span class="category-count">26</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/></svg><span>AI应用</span><span class="category-count">121</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg><span>设计素材</span><span class="category-count">244</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>设计工具</span><span class="category-count">41</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>效率工具</span><span class="category-count">16</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>数据分析</span><span class="category-count">114</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span>常用工具</span><span class="category-count">25</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg><span>企业内部</span><span class="category-count">129</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>学习资源</span><span class="category-count">69</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg><span>参考导航</span><span class="category-count">8</span></div>
-<div class="category-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg><span>其他</span><span class="category-count">201</span></div>
+<div class="category-item active" data-cat="all">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+<span>全部</span><span class="category-count">1067</span>
+</div>
+<div class="category-item" data-cat="AI对话"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>AI对话</span><span class="category-count">73</span></div>
+<div class="category-item" data-cat="AI绘画"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>AI绘画</span><span class="category-count">26</span></div>
+<div class="category-item" data-cat="AI应用"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/></svg><span>AI应用</span><span class="category-count">121</span></div>
+<div class="category-item" data-cat="设计素材"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg><span>设计素材</span><span class="category-count">244</span></div>
+<div class="category-item" data-cat="设计工具"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>设计工具</span><span class="category-count">41</span></div>
+<div class="category-item" data-cat="效率工具"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>效率工具</span><span class="category-count">16</span></div>
+<div class="category-item" data-cat="数据分析"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>数据分析</span><span class="category-count">114</span></div>
+<div class="category-item" data-cat="常用工具"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span>常用工具</span><span class="category-count">25</span></div>
+<div class="category-item" data-cat="企业内部"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg><span>企业内部</span><span class="category-count">129</span></div>
+<div class="category-item" data-cat="学习资源"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>学习资源</span><span class="category-count">69</span></div>
+<div class="category-item" data-cat="参考导航"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg><span>参考导航</span><span class="category-count">8</span></div>
+<div class="category-item" data-cat="其他"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/></svg><span>其他</span><span class="category-count">201</span></div>
 
 </nav>
+<div class="sidebar-footer">
+<a href="admin.html" class="sidebar-action">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+<span>管理</span>
+</a>
+</div>
 </aside>
 <main class="main">
 <section class="hero">
+<div class="hero-content">
 <h1>发现优质AI工具与设计资源</h1>
-<p class="hero-subtitle">共 1067 个书签</p>
+<p class="hero-subtitle">共 1067 个书签 · 左侧分类切换</p>
+<div class="search-wrapper">
 <div class="search-box">
 <input type="text" id="search" placeholder="搜索网站、工具、资源...">
-<button onclick="filterCards()">搜索</button>
+<button class="search-btn">搜索</button>
+</div>
 </div>
 </section>
 <div class="main-content">
-<div class="section"><h2 class="section-title">AI对话</h2>
+<div class="hint-text" id="noResult" style="display:none">未找到匹配的搜索结果</div>
+<div class="section cat-section" data-cat="AI对话">
+<h2 class="section-title">AI对话</h2>
 <div class="cards-grid">
 <a href="https://prompthero.com/featured" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=prompthero.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">PromptHero - Search prompts for Stable Diffusion, ChatGPT &amp;amp; Midjourney</div><div class="card-tags"><span class="card-tag">AI对话</span></div></div></a>
 <a href="https://www.ppword.cn/index.html?code=091GI11w3SHdX03O8L1w3XmAaW3GI11R&amp;state=web#/dashboard" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=ppword.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">ChatGPT - ppword</div><div class="card-tags"><span class="card-tag">AI对话</span></div></div></a>
@@ -152,7 +173,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1564102737" target="_blank" class="card"><img class="card-logo" src="https://www.wjx.cn/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">我的问卷 - 问卷星（免费版）</div><div class="card-tags"><span class="card-tag">问卷调研</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">AI绘画</h2>
+<div class="section cat-section" data-cat="AI绘画">
+<h2 class="section-title">AI绘画</h2>
 <div class="cards-grid">
 <a href="https://www.bzu.cn/mj_prompt_tool" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=bzu.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Midjourney提示词生成器,关键词在线生成工具助手[免费]-B族智伴</div><div class="card-tags"><span class="card-tag">AI绘画</span></div></div></a>
 <a href="https://www.shijuezu.com/?via=aiagc.com#huihua" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=shijuezu.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">视觉族-免费在线AI绘画Stable Diffusion图片生成器工具</div><div class="card-tags"><span class="card-tag">AI绘画</span></div></div></a>
@@ -182,7 +204,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://www.yjpoo.com/ai-image/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=yjpoo.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">ai绘画_映技派,专注ai人工智能!</div><div class="card-tags"><span class="card-tag">企业产品</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">AI应用</h2>
+<div class="section cat-section" data-cat="AI应用">
+<h2 class="section-title">AI应用</h2>
 <div class="cards-grid">
 <a href="https://cursor.com/cn" target="_blank" class="card"><img class="card-logo" src="https://www.cursor.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Cursor</div><div class="card-tags"><span class="card-tag">AI工具</span></div></div></a>
 <a href="https://www.noya.io/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=noya.io&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Noya | Design &amp;amp; Development Tools</div><div class="card-tags"><span class="card-tag">AI工具</span></div></div></a>
@@ -307,7 +330,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://aidh123.com/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=aidh123.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">AI导航123 | AI导航网站,AI导航官网,AI工具导航,AI工具箱,500+AI工具导航网站</div><div class="card-tags"><span class="card-tag">企业产品</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">设计素材</h2>
+<div class="section cat-section" data-cat="设计素材">
+<h2 class="section-title">设计素材</h2>
 <div class="cards-grid">
 <a href="https://ant-design-x.antgroup.com/index-cn" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=ant-design-x.antgroup.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Ant Design X - 轻松打造 AI 驱动的界面。</div><div class="card-tags"><span class="card-tag">UI组件库</span></div></div></a>
 <a href="https://www.tosound.com/search/word-%E9%9F%B3%E4%B9%90%EF%BC%9A%E8%8A%82%E5%A5%8F%E6%84%9F" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=tosound.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">音乐：节奏感 - 声音搜索 - 淘声网 - 免费音效素材资源|视频游戏配乐下载</div><div class="card-tags"><span class="card-tag">产品设计</span></div></div></a>
@@ -555,7 +579,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://www.zcool.com.cn/work/ZNDIyMjMyMTI=.html" target="_blank" class="card"><img class="card-logo" src="https://nb-img4.zhimgishare.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">2019「blued」年终述职报告|UI|APP界面|renocsc - 原创作品 - 站酷 (ZCOOL)</div><div class="card-tags"><span class="card-tag">效率工具</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">设计工具</h2>
+<div class="section cat-section" data-cat="设计工具">
+<h2 class="section-title">设计工具</h2>
 <div class="cards-grid">
 <a href="https://lanhuapp.com/web/#/item/project/stage?tid=f77a0ca6-eba8-4f5c-ae76-7cfcb6088f72&amp;pid=40316cb3-199d-4caf-948c-e66225c5d07a" target="_blank" class="card"><img class="card-logo" src="https://cdn.nlark.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">雅意APP-蓝湖</div><div class="card-tags"><span class="card-tag">设计协作</span></div></div></a>
 <a href="https://www.shangyexinzhi.com/article/4211627.html" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=shangyexinzhi.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">UI设计师如何提高设计还原的质量和验收效率_IXDC-商业新知</div><div class="card-tags"><span class="card-tag">产品设计</span></div></div></a>
@@ -600,7 +625,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://mastergo.com/files/project/105669295407949" target="_blank" class="card"><img class="card-logo" src="https://mastergo.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Portal页设计230919 - MasterGo</div><div class="card-tags"><span class="card-tag">UI设计</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">效率工具</h2>
+<div class="section cat-section" data-cat="效率工具">
+<h2 class="section-title">效率工具</h2>
 <div class="cards-grid">
 <a href="https://hf0y97ff1r.feishu.cn/wiki/CmJyw1xq0ijgWKkXQY0cX2blnkf" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=hf0y97ff1r.feishu.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">大模型时代，我们真的不再需要分词了吗？.pdf - 飞书云文档</div><div class="card-tags"><span class="card-tag">协同办公</span></div></div></a>
 <a href="https://smallpdf.com/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=smallpdf.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Smallpdf.com-您所有PDF问题的免费解决方案</div><div class="card-tags"><span class="card-tag">开发工具</span></div></div></a>
@@ -620,7 +646,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://ai.aliyun.com/ocr?spm=5176.28536895.nav-v2-dropdown-menu-0.d_main_9_2_0.406b586cPTwzcv" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=ai.aliyun.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">文字识别_OCR 文字识别_图片识别文字_数据智能-阿里云</div><div class="card-tags"><span class="card-tag">云服务</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">数据分析</h2>
+<div class="section cat-section" data-cat="数据分析">
+<h2 class="section-title">数据分析</h2>
 <div class="cards-grid">
 <a href="https://www.jiguang.cn/reports/47" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=jiguang.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">极光大数据：新闻资讯类app研究报告</div><div class="card-tags"><span class="card-tag">产品设计</span></div></div></a>
 <a href="http://www.tanmer.com/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=tanmer.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">大数据 | 探码科技【官网】</div><div class="card-tags"><span class="card-tag">产品设计</span></div></div></a>
@@ -738,7 +765,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://cover.weixin.qq.com/cgi-bin/mmcover-bin/readtemplate?t=page/index#/covers" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=cover.weixin.qq.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">微信红包封面开放平台</div><div class="card-tags"><span class="card-tag">效率工具</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">常用工具</h2>
+<div class="section cat-section" data-cat="常用工具">
+<h2 class="section-title">常用工具</h2>
 <div class="cards-grid">
 <a href="https://chuangke.aliyun.com/" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=chuangke.aliyun.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">阿里云创新中心-企业服务-创新创业服务-阿里云</div><div class="card-tags"><span class="card-tag">云服务</span></div></div></a>
 <a href="https://www.yuque.com/meifangmia/zwcdgs/yf0h0p" target="_blank" class="card"><img class="card-logo" src="https://gw.alipayobjects.com/ics/workbench/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">【置顶】B端组件库/设计规范 · 语雀</div><div class="card-tags"><span class="card-tag">知识库</span></div></div></a>
@@ -767,7 +795,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://shimo.im/desktop?from=sqsmln&amp;origin=celebration&amp;freeDays=14&amp;type=login" target="_blank" class="card"><img class="card-logo" src="https://shimo.im/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">我的桌面 - 石墨文档(1)</div><div class="card-tags"><span class="card-tag">在线文档</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">企业内部</h2>
+<div class="section cat-section" data-cat="企业内部">
+<h2 class="section-title">企业内部</h2>
 <div class="cards-grid">
 <a href="https://yayi.wenge.com/#/chat/21" target="_blank" class="card"><img class="card-logo" src="https://yayi.wenge.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">应用中心 - YAYI雅意</div><div class="card-tags"><span class="card-tag">企业产品</span></div></div></a>
 <a href="https://yayi.wenge.com/maas/#/HeaderNav/home" target="_blank" class="card"><img class="card-logo" src="https://yayi.wenge.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">雅意 MaaS开发平台</div><div class="card-tags"><span class="card-tag">企业产品</span></div></div></a>
@@ -900,7 +929,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://stg-yayi.wenge.com/jn-consult/#/index" target="_blank" class="card"><img class="card-logo" src="https://yayi.wenge.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">主页-资讯信息</div><div class="card-tags"><span class="card-tag">企业产品</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">学习资源</h2>
+<div class="section cat-section" data-cat="学习资源">
+<h2 class="section-title">学习资源</h2>
 <div class="cards-grid">
 <a href="https://baijiahao.baidu.com/s?id=1641199286094656814&amp;wfr=spider&amp;for=pc" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=baijiahao.baidu.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">C4D教程小技巧系列13. 制作摄像机动画，你需要知道这些知识和技巧</div><div class="card-tags"><span class="card-tag">3D建模</span></div></div></a>
 <a href="https://effect.douyin.com/learn/effect-creator" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=effect.douyin.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">视频特效如何制作-视频特效制作教程-抖音特效开放平台</div><div class="card-tags"><span class="card-tag">产品设计</span></div></div></a>
@@ -973,7 +1003,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://www.zhihuishu.com/" target="_blank" class="card"><img class="card-logo" src="https://img.zhihuishare.com/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">智慧树网</div><div class="card-tags"><span class="card-tag">问答社区</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">参考导航</h2>
+<div class="section cat-section" data-cat="参考导航">
+<h2 class="section-title">参考导航</h2>
 <div class="cards-grid">
 <a href="https://blog.csdn.net/weixin_45756488/article/details/121772958" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=blog.csdn.net&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">代码规范化的七大原则_Huanghao.的博客-CSDN博客_代码规范</div><div class="card-tags"><span class="card-tag">技术博客</span></div></div></a>
 <a href="http://www.uxmap.cn/page/#/uxmap/preview?id=1" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=uxmap.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">设计导航-好设计从这里开始|Uxmap</div><div class="card-tags"><span class="card-tag">开发工具</span></div></div></a>
@@ -985,7 +1016,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <a href="https://dnipkggqxh.feishu.cn/wiki/StUIw2wu8iJwt2kEB54c2I4cngh" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=dnipkggqxh.feishu.cn&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">AI产品榜·国内总榜TOP100 - 飞书云文档</div><div class="card-tags"><span class="card-tag">协同办公</span></div></div></a>
 </div>
 </div>
-<div class="section"><h2 class="section-title">其他</h2>
+<div class="section cat-section" data-cat="其他">
+<h2 class="section-title">其他</h2>
 <div class="cards-grid">
 <a href="https://www.notion.com/product/ai" target="_blank" class="card"><img class="card-logo" src="https://www.notion.so/images/favicon.ico" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">Meet the new Notion AI</div><div class="card-tags"><span class="card-tag">笔记</span></div></div></a>
 <a href="https://jimeng.jianying.com/ai-tool/login" target="_blank" class="card"><img class="card-logo" src="https://www.google.com/s2/favicons?domain=jimeng.jianying.com&amp;sz=64" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">即梦AI - 一站式AI创作平台</div><div class="card-tags"><span class="card-tag">AI视频</span></div></div></a>
@@ -1194,14 +1226,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 </div>
 </main>
 <script>
-function filterCards(){
-var q=document.getElementById('search').value.toLowerCase();
-document.querySelectorAll('.card').forEach(function(c){
-var name=c.querySelector('.card-name').textContent.toLowerCase();
-c.style.display=name.indexOf(q)>-1?'flex':'none';
-});
+
+var CAT_ORDER = ['AI对话', 'AI绘画', 'AI应用', '设计素材', '设计工具', '效率工具', '数据分析', '常用工具', '企业内部', '学习资源', '参考导航', '其他'];
+var currentCat = 'all';
+
+function selectCategory(cat) {
+    currentCat = cat;
+    // 更新侧边栏高亮
+    document.querySelectorAll('.category-item').forEach(function(el) {
+        el.classList.toggle('active', el.dataset.cat === cat || (cat === 'all' && el.dataset.cat === undefined));
+    });
+    // 筛选卡片
+    document.querySelectorAll('.cat-section').forEach(function(el) {
+        el.style.display = (cat === 'all' || el.dataset.cat === cat) ? 'block' : 'none';
+    });
+    // 滚动到顶部
+    document.querySelector('.main').scrollTop = 0;
 }
-document.getElementById('search').addEventListener('input',filterCards);
+
+function filterCards() {
+    var q = document.getElementById('search').value.toLowerCase();
+    var visibleCats = currentCat === 'all' ? CAT_ORDER : [currentCat];
+    document.querySelectorAll('.card').forEach(function(c) {
+        var section = c.closest('.cat-section');
+        if (!section) return;
+        var cat = section.dataset.cat;
+        var name = c.querySelector('.card-name').textContent.toLowerCase();
+        var matchCat = visibleCats.indexOf(cat) > -1;
+        var matchSearch = name.indexOf(q) > -1;
+        c.style.display = (matchCat && matchSearch) ? 'flex' : 'none';
+    });
+}
+
+// 初始化
+document.querySelector('.category-item[data-cat="all"]')?.classList.add('active');
+document.getElementById('search').addEventListener('input', filterCards);
+
+// 侧边栏点击事件
+document.querySelectorAll('.category-item').forEach(function(el) {
+    el.addEventListener('click', function() {
+        selectCategory(el.dataset.cat || 'all');
+    });
+});
+
 </script>
 </body>
 </html>
