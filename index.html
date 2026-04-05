@@ -55,15 +55,20 @@
     .section-count { font-size: 13px; color: #94a3b8; margin-left: 8px; }
     
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 30px; }
-    .card { background: #fff; border-radius: 12px; padding: 16px 14px; display: flex; align-items: center; gap: 12px; transition: all 0.25s; cursor: pointer; text-decoration: none; border: 1px solid #e5e7eb; }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); border-color: #0052FF; }
+    .card { background: #fff; border-radius: 12px; padding: 16px 14px; display: flex; align-items: center; gap: 12px; transition: all 0.25s; cursor: grab; text-decoration: none; border: 1px solid #e5e7eb; position: relative; user-select: none; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-color: #c0d0f0; }
+    .card:active { cursor: grabbing; }
+    .card.dragging { opacity: 0.4; transform: scale(0.95); }
+    .card.drag-over { border-color: #0052FF; border-style: dashed; background: rgba(0,82,255,0.03); }
     .card-logo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: #f8fafc; flex-shrink: 0; }
     .card-info { flex: 1; min-width: 0; }
     .card-name { font-size: 14px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
     .card-tags { display: flex; gap: 6px; margin-top: 6px; }
     .card-tag { font-size: 11px; color: #64748B; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+    /* 删除按钮 */
+    .card-del { display: none; position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; background: #ef4444; border-radius: 50%; color: #fff; font-size: 12px; line-height: 20px; text-align: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+    .card:hover .card-del { opacity: 1; }
     
-    /* 右下角按钮组 */
     .float-btns { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 100; }
     .float-btn { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .float-btn svg { width: 24px; height: 24px; }
@@ -71,21 +76,22 @@
     .float-btn-add svg { color: #fff; }
     .float-btn-add:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,82,255,0.4); }
     
-    /* 提示文字 */
     .hint-bar { position: fixed; bottom: 28px; right: 86px; font-size: 12px; color: #94a3b8; white-space: nowrap; }
     
-    /* Toast */
     .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 14px; z-index: 99999; opacity: 0; transition: all 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    /* 拖拽提示 */
+    .drag-hint { font-size: 12px; color: #c0c0c0; margin-left: 8px; }
   </style>
 </head>
 <body>
   <div class="float-btns">
-    <div class="float-btn float-btn-add" onclick="addBookmark()" title="添加当前页面到书签">
+    <div class="float-btn float-btn-add" onclick="addBookmark()" title="添加书签">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
   </div>
-  <div class="hint-bar">点击 + 添加书签</div>
+  <div class="hint-bar">拖拽可排序<span class="drag-hint">| 删除请hover</span></div>
   <div id="toast" class="toast"></div>
 
   <aside class="sidebar">
@@ -111,7 +117,7 @@
       <div class="hero-bg" id="heroBg"></div>
       <div class="hero-content">
         <h1 class="hero-title">发现优质<span>AI工具</span>与<span>设计资源</span></h1>
-        <p class="hero-subtitle">1067 个精选网站 · 点击右下角添加书签</p>
+        <p class="hero-subtitle">1067 个精选网站 · 点击右下角添加 · 拖拽排序</p>
         <div class="search-box">
           <input type="text" id="searchInput" placeholder="搜索网站、工具、资源...">
           <button class="search-btn">搜索</button>
@@ -151,6 +157,8 @@ var CAT_ICONS = {
 var CAT_ORDER = ["AI\u5bf9\u8bdd", "AI\u7ed8\u753b", "AI\u5e94\u7528", "\u8bbe\u8ba1\u7d20\u6750", "\u8bbe\u8ba1\u5de5\u5177", "\u6548\u7387\u5de5\u5177", "\u6570\u636e\u5206\u6790", "\u5e38\u7528\u5de5\u5177", "\u4f01\u4e1a\u5185\u90e8", "\u5b66\u4e60\u8d44\u6e90", "\u53c2\u8003\u5bfc\u822a", "\u5176\u4ed6"];
 var currentCat = "all";
 var searchTerm = "";
+var draggedCard = null;
+var draggedUrl = null;
 
 var categoryNav = document.getElementById("categoryNav");
 var mainContent = document.getElementById("mainContent");
@@ -169,16 +177,10 @@ function addBookmark() {
   var title = prompt("网站名称：", hostname);
   if (!title || !title.trim()) return;
   
-  // 保存最后输入的网址，便于添加页面获取
-  localStorage.setItem("cyyNav_lastUrl", url);
-  
-  // 直接添加
   var favicon = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(url) + "&sz=64";
-  var newBookmark = { title: title.trim(), url: url, logo: favicon, category: "其他", tags: [], isCustom: true, addedAt: Date.now() };
+  var newBookmark = { title: title.trim(), url: url, logo: favicon, category: "其他", tags: [], isCustom: true, addedAt: Date.now(), order: Date.now() };
   
   var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
-  
-  // 检查是否已存在
   var exists = customBookmarks.some(function(b) { return b.url === url; });
   if (exists) { showToast("该网址已在书签中"); return; }
   
@@ -186,6 +188,77 @@ function addBookmark() {
   localStorage.setItem("cyyNav_customBookmarks", JSON.stringify(customBookmarks));
   showToast("已添加！共 " + customBookmarks.length + " 个书签");
   renderCategoryNav();
+  renderContent();
+}
+
+// ====== 删除书签 ======
+function deleteBookmark(url, e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!confirm("确定删除这个书签？")) return;
+  
+  var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
+  customBookmarks = customBookmarks.filter(function(b) { return b.url !== url; });
+  localStorage.setItem("cyyNav_customBookmarks", JSON.stringify(customBookmarks));
+  showToast("已删除");
+  renderCategoryNav();
+  renderContent();
+}
+
+// ====== 拖拽排序 ======
+function onCardDragStart(e, url) {
+  draggedCard = this;
+  draggedUrl = url;
+  this.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", url);
+}
+
+function onCardDragEnd(e) {
+  this.classList.remove("dragging");
+  document.querySelectorAll(".card").forEach(function(c) { c.classList.remove("drag-over"); });
+  draggedCard = null;
+  draggedUrl = null;
+}
+
+function onCardDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  if (this !== draggedCard) {
+    this.classList.add("drag-over");
+  }
+}
+
+function onCardDragLeave(e) {
+  this.classList.remove("drag-over");
+}
+
+function onCardDrop(e, targetUrl) {
+  e.preventDefault();
+  this.classList.remove("drag-over");
+  
+  if (!draggedUrl || draggedUrl === targetUrl) return;
+  
+  var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
+  
+  // 找到被拖拽和目标书签
+  var dragIdx = customBookmarks.findIndex(function(b) { return b.url === draggedUrl; });
+  var targetIdx = customBookmarks.findIndex(function(b) { return b.url === targetUrl; });
+  
+  if (dragIdx === -1 || targetIdx === -1) return;
+  
+  // 从原位置移除
+  var dragged = customBookmarks.splice(dragIdx, 1)[0];
+  
+  // 插入到目标位置
+  if (dragIdx < targetIdx) {
+    customBookmarks.splice(targetIdx, 0, dragged);
+  } else {
+    customBookmarks.splice(targetIdx, 0, dragged);
+  }
+  
+  localStorage.setItem("cyyNav_customBookmarks", JSON.stringify(customBookmarks));
+  renderContent();
 }
 
 function showToast(msg) {
@@ -218,17 +291,22 @@ function renderCategoryNav() {
 }
 
 function renderContent() {
-  var allBookmarks = bookmarksData.concat(JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]"));
+  // 合并：原始书签 + 自定义书签
+  var customBookmarks = JSON.parse(localStorage.getItem("cyyNav_customBookmarks") || "[]");
+  var allBookmarks = bookmarksData.concat(customBookmarks);
+  
   var filtered = allBookmarks;
   if (currentCat !== "all") filtered = filtered.filter(function(b) { return b.category === currentCat; });
   if (searchTerm) {
     var term = searchTerm.toLowerCase();
     filtered = filtered.filter(function(b) { return b.title.toLowerCase().includes(term) || b.url.toLowerCase().includes(term); });
   }
+  
   if (filtered.length === 0) {
     mainContent.innerHTML = "<p style='text-align:center;padding:3rem;color:#64748B;font-size:15px'>未找到相关内容<br><br><span style='font-size:13px;color:#94a3b8'>点击右下角 + 按钮添加书签</span></p>";
     return;
   }
+  
   var grouped = {};
   filtered.forEach(function(b) { if (!grouped[b.category]) grouped[b.category] = []; grouped[b.category].push(b); });
   var html = "";
@@ -237,11 +315,22 @@ function renderContent() {
     var items = grouped[cat];
     html += '<div class="section-header"><div class="section-icon">' + CAT_ICONS[cat] + '</div><div class="section-title">' + cat + '</div><div class="section-count">' + items.length + '</div></div><div class="cards-grid">';
     items.forEach(function(bm) {
-      html += '<a href="' + bm.url + '" target="_blank" class="card"><img class="card-logo" src="' + bm.logo + '" onerror="this.style.display=\'none\'"><div class="card-info"><div class="card-name">' + bm.title + '</div><div class="card-tags"><span class="card-tag">' + (bm.tags[0] || '') + '</span></div></div></a>';
+      var delBtn = bm.isCustom ? '<div class="card-del" onclick="deleteBookmark(\'' + bm.url.replace(/'/g, "\\'") + '\', event)" title="删除">×</div>' : '';
+      html += '<a href="' + bm.url + '" target="_blank" class="card" draggable="true" data-url="' + bm.url.replace(/"/g, "&quot;") + '">' + delBtn + '<img class="card-logo" src="' + bm.logo + '" onerror="this.style.display=\'none\'"><div class="card-info"><div class="card-name">' + bm.title + '</div><div class="card-tags"><span class="card-tag">' + (bm.tags[0] || '') + '</span></div></div></a>';
     });
     html += "</div>";
   });
   mainContent.innerHTML = html;
+  
+  // 绑定拖拽事件
+  var cards = document.querySelectorAll(".card");
+  cards.forEach(function(card) {
+    card.addEventListener("dragstart", function(e) { onCardDragStart.call(this, e, this.getAttribute("data-url")); });
+    card.addEventListener("dragend", onCardDragEnd);
+    card.addEventListener("dragover", onCardDragOver);
+    card.addEventListener("dragleave", onCardDragLeave);
+    card.addEventListener("drop", function(e) { onCardDrop.call(this, e, this.getAttribute("data-url")); });
+  });
 }
 
 function selectCategory(cat) { currentCat = cat; renderCategoryNav(); renderContent(); }
