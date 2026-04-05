@@ -6,7 +6,7 @@
 <title>CYY工具集</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-.drop-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,82,255,0.08);border:3px dashed #0052FF;z-index:9998;display:none;pointer-events:none;justify-content:center;align-items:center;flex-direction:column}.drop-overlay.show{display:flex}.drop-overlay-text{background:#fff;padding:24px 40px;border-radius:16px;font-size:18px;font-weight:600;color:#0052FF;box-shadow:0 8px 32px rgba(0,82,255,0.3);text-align:center;line-height:1.6}.drop-overlay-icon{font-size:48px;margin-bottom:12px}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column}
 .sidebar-header{padding:20px}
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:#333}
@@ -91,7 +91,6 @@
 </style>
 </head>
 <body>
-<div class="drop-overlay" id="dropOverlay"><div class="drop-overlay-icon"></div><div class="drop-overlay-text">松开即可添加书签</div></div>
 <div id="add-modal"><div class="modal-card"><div class="modal-title">添加到 CYY工具集</div><div class="modal-subtitle" id="add-source-url"></div><div class="form-group"><label>名称</label><input type="text" id="add-title" placeholder="网站名称"></div><div class="form-group"><label>分类</label><select id="add-category"><option value="其他">其他</option><option value="AI对话">AI对话</option><option value="AI绘画">AI绘画</option><option value="AI应用">AI应用</option><option value="设计素材">设计素材</option><option value="设计工具">设计工具</option><option value="效率工具">效率工具</option><option value="数据分析">数据分析</option><option value="常用工具">常用工具</option><option value="企业内部">企业内部</option><option value="学习资源">学习资源</option><option value="参考导航">参考导航</option></select></div><div class="form-group"><label>标签（逗号分隔）</label><input type="text" id="add-tags" placeholder="如: AI, 工具"></div><div class="modal-actions"><button class="btn btn-cancel" onclick="closeAddModal()">取消</button><button class="btn btn-primary" onclick="confirmAdd()">保存</button></div></div></div>
 <div id="toast" class="toast"></div>
 <aside class="sidebar"><div class="sidebar-header"><a href="#" class="logo" onclick="location.reload();return false;"><div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><span>CYY工具集</span></a></div><nav class="category-nav" id="categoryNav"></nav><div class="sidebar-footer"><a href="admin.html" class="sidebar-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span>管理</span></a></div></aside>
@@ -109,11 +108,11 @@ var categoryNav=document.getElementById("categoryNav"),mainContent=document.getE
 (function(){var p=new URLSearchParams(location.search);if(p.get("add")==="1"){var u=p.get("url")||"",t=p.get("title")||"";if(u)openAddModal(u,t);history.replaceState(null,"",location.pathname)}})();
 
 // 提取 URL（支持多种拖拽格式）
-function extractUrl(dt){var url="";try{url=dt.getData("text/plain")||""}catch(e){url=""}url=url.trim();if(url&&!url.startsWith("http")&&!url.startsWith("https"))url="";if(!url){try{var u=dt.getData("text/uri-list")||"";if(u)url=u.split("\n")[0].split("#")[0].trim()}catch(e){}}return url}
+function extractUrl(dt){var url="";var types=Array.from(dt.types||[]);if(types.indexOf&&(types.indexOf("text/uri-list")>-1||types.indexOf("text/x-moz-url")>-1)){try{url=dt.getData("text/uri-list")||dt.getData("text/x-moz-url")}catch(e){}}if(url)url=url.split("\n")[0].split("#")[0].trim();if(!url||!url.startsWith("http")){try{url=dt.getData("text/plain")}catch(e){}url=(url||"").trim()}if(url&&!url.startsWith("http")&&!url.startsWith("https"))url="";return url}
 
 // 外部拖拽放下事件
 document.addEventListener("dragover",function(e){e.preventDefault()});
-document.addEventListener("dragover",function(e){document.getElementById("dropOverlay").classList.add("show")});document.addEventListener("dragleave",function(e){if(e.target===document.documentElement||e.target.id==="dropOverlay"){document.getElementById("dropOverlay").classList.remove("show")}});document.addEventListener("drop",function(e){e.preventDefault();document.getElementById("dropOverlay").classList.remove("show");var dt=e.dataTransfer||window.event;var url=extractUrl(dt);if(url&&url.startsWith("http")){var h=url;try{h=new URL(url).hostname.replace("www.","")}catch(err){}openAddModal(url,h)}});
+document.addEventListener("drop",function(e){e.preventDefault();var dt=e.dataTransfer||window.event;var url=extractUrl(dt);if(url&&url.startsWith("http")){var h=url;try{h=new URL(url).hostname.replace("www.","")}catch(err){}openAddModal(url,h)}});
 
 // 内部卡片拖拽
 function onDragStart(e,el,u){draggedEl=el;draggedUrl=u;el.classList.add("dragging");e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",u)}catch(err){}}
