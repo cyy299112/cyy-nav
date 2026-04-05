@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 - CYY工具集</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+    
+    .header { background: #fff; padding: 16px 24px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 20px; color: #1e293b; }
+    .header a { color: #0052FF; text-decoration: none; }
+    
+    .container { max-width: 1200px; margin: 24px auto; padding: 0 24px; }
+    
+    .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 16px; color: #1e293b; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 14px; color: #64748B; margin-bottom: 8px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
+    .form-group input:focus { outline: none; border-color: #0052FF; }
+    
+    .row { display: flex; gap: 16px; }
+    .row .form-group { flex: 1; }
+    
+    .btn { display: inline-block; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #0052FF; color: #fff; }
+    .btn-primary:hover { background: #4D7CFF; }
+    .btn-secondary { background: #f1f5f9; color: #64748B; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    
+    .preview-box { margin-top: 16px; padding: 20px; background: #f8fafc; border-radius: 8px; text-align: center; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+    .preview-box .bg-preview { width: 100%; height: 150px; border-radius: 8px; background-size: cover; background-position: center; }
+    
+    .tips { font-size: 13px; color: #64748B; line-height: 1.6; background: #f8fafc; padding: 16px; border-radius: 8px; }
+    .tips li { margin-bottom: 6px; }
+    
+    /* 书签列表 */
+    .bookmark-list { max-height: 400px; overflow-y: auto; }
+    .bookmark-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+    .bookmark-item:hover { background: #f8fafc; }
+    .bookmark-item img { width: 32px; height: 32px; border-radius: 6px; }
+    .bookmark-info { flex: 1; min-width: 0; }
+    .bookmark-title { font-size: 14px; color: #1e293b; font-weight: 500; }
+    .bookmark-url { font-size: 12px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bookmark-actions { display: flex; gap: 8px; }
+    
+    .search-box { display: flex; gap: 12px; margin-bottom: 16px; }
+    .search-box input { flex: 1; }
+    
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; }
+    .tab-btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; background: none; border: none; color: #64748B; }
+    .tab-btn.active { background: #0052FF; color: #fff; }
+    
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🛠️ CYY工具集管理后台</h1>
+    <a href="index.html">← 返回首页</a>
+  </div>
+  
+  <div class="container">
+    <!-- Tab 导航 -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('bg')">🎨 背景图管理</button>
+      <button class="tab-btn" onclick="switchTab('bookmark')">🔗 书签管理</button>
+    </div>
+    
+    <!-- 背景图管理 -->
+    <div id="tab-bg">
+      <div class="card">
+        <h2>🖼️ 首页头部背景图</h2>
+        
+        <div class="form-group">
+          <label>背景图 URL（支持网络图片地址或 CSS 渐变）</label>
+          <input type="text" id="bgUrl" placeholder="https://example.com/bg.jpg 或 linear-gradient(...)">
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <button class="btn btn-primary" onclick="applyBg()">应用背景图</button>
+          <button class="btn btn-secondary" onclick="useDefaultBg()">使用默认背景</button>
+          <button class="btn btn-danger" onclick="clearBg()">清除背景图</button>
+        </div>
+        
+        <div class="preview-box">
+          <div class="bg-preview" id="bgPreview" style="display: none;"></div>
+          <p id="bgPreviewText">点击"应用背景图"后显示预览</p>
+        </div>
+        
+        <div class="tips" style="margin-top: 16px;">
+          <strong>💡 使用提示：</strong>
+          <ul>
+            <li>支持输入网络图片 URL（如 https://xxx.jpg）</li>
+            <li>支持 CSS 渐变（如 linear-gradient(135deg, #0052FF, #4D7CFF)）</li>
+            <li>推荐使用横版图片，最佳尺寸 1920x1080 或以上</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🎨 预设背景</h2>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="applyPresetBg('gradient1')">🌈 蓝色渐变</button>
+          <button class="btn btn-secondary" onclick="applyPresetBg('gradient2')">🟣 紫色梦幻</button>
+          <button class="btn btn-secondary" onclick="applyPresetBg('gradient3')">🌊 青色潮流</button>
+          <button class="btn btn-secondary" onclick="applyPresetBg('dark')">🌙 深色科技</button>
+          <button class="btn btn-secondary" onclick="applyPresetBg('minimal')">⬜ 简约白色</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 书签管理 -->
+    <div id="tab-bookmark" class="hidden">
+      <div class="card">
+        <h2>➕ 新增书签</h2>
+        <div class="row">
+          <div class="form-group">
+            <label>网站名称</label>
+            <input type="text" id="newTitle" placeholder="例如：百度">
+          </div>
+          <div class="form-group">
+            <label>网址</label>
+            <input type="url" id="newUrl" placeholder="https://baidu.com">
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group">
+            <label>分类</label>
+            <select id="newCategory">
+              <option value="AIGC & AI工具">AIGC & AI工具</option>
+              <option value="产品设计">产品设计</option>
+              <option value="设计资源">设计资源</option>
+              <option value="开发工具">开发工具</option>
+              <option value="数据可视化">数据可视化</option>
+              <option value="视频动画">视频动画</option>
+              <option value="参考网站">参考网站</option>
+              <option value="学习教育">学习教育</option>
+              <option value="公司产品">公司产品</option>
+              <option value="工作效率">工作效率</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>标签（用逗号分隔）</label>
+            <input type="text" id="newTags" placeholder="例如：搜索引擎,百度">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="addBookmark()">添加书签</button>
+      </div>
+      
+      <div class="card">
+        <h2>🔗 书签列表</h2>
+        <div class="search-box">
+          <input type="text" id="searchBookmarks" placeholder="搜索书签..." oninput="filterBookmarks()">
+          <select id="filterCategory" onchange="filterBookmarks()">
+            <option value="">全部分类</option>
+            <option value="AIGC & AI工具">AIGC & AI工具</option>
+            <option value="产品设计">产品设计</option>
+            <option value="设计资源">设计资源</option>
+            <option value="开发工具">开发工具</option>
+            <option value="数据可视化">数据可视化</option>
+            <option value="视频动画">视频动画</option>
+            <option value="参考网站">参考网站</option>
+            <option value="学习教育">学习教育</option>
+            <option value="公司产品">公司产品</option>
+            <option value="工作效率">工作效率</option>
+          </select>
+        </div>
+        <div class="bookmark-list" id="bookmarkList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 预设背景
+    var presetBgs = {
+      gradient1: 'linear-gradient(135deg, rgba(0,82,255,0.2) 0%, rgba(77,124,255,0.15) 50%, rgba(0,212,255,0.1) 100%)',
+      gradient2: 'linear-gradient(135deg, rgba(139,92,246,0.2) 0%, rgba(168,85,247,0.15) 50%, rgba(236,72,153,0.1) 100%)',
+      gradient3: 'linear-gradient(135deg, rgba(6,182,212,0.2) 0%, rgba(34,211,238,0.15) 50%, rgba(103,232,249,0.1) 100%)',
+      dark: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+      minimal: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)'
+    };
+    
+    // 模拟书签数据（实际应从主页读取或使用 localStorage）
+    var bookmarksData = JSON.parse(localStorage.getItem('cyyNav_bookmarks') || '[]');
+    if (bookmarksData.length === 0) {
+      // 初始化默认数据
+      bookmarksData = [
+        {title: '百度', url: 'https://www.baidu.com', category: '参考网站', tags: ['搜索引擎', '百度']},
+        {title: 'Google', url: 'https://www.google.com', category: '参考网站', tags: ['搜索引擎', 'Google']},
+        {title: 'GitHub', url: 'https://github.com', category: '开发工具', tags: ['代码', '开源']}
+      ];
+      localStorage.setItem('cyyNav_bookmarks', JSON.stringify(bookmarksData));
+    }
+    
+    // 加载当前背景图
+    var currentBg = localStorage.getItem('cyyNav_heroBg') || '';
+    if (currentBg) {
+      document.getElementById('bgUrl').value = currentBg;
+      showBgPreview(currentBg);
+    }
+    
+    // 显示背景图预览
+    function showBgPreview(bg) {
+      var preview = document.getElementById('bgPreview');
+      var text = document.getElementById('bgPreviewText');
+      preview.style.display = 'block';
+      preview.style.backgroundImage = bg;
+      text.textContent = '当前背景图预览';
+    }
+    
+    // Tab 切换
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+      event.target.classList.add('active');
+      
+      document.getElementById('tab-bg').classList.add('hidden');
+      document.getElementById('tab-bookmark').classList.add('hidden');
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      
+      if (tab === 'bookmark') {
+        renderBookmarkList();
+      }
+    }
+    
+    // 应用背景图
+    function applyBg() {
+      var url = document.getElementById('bgUrl').value.trim();
+      if (!url) {
+        alert('请输入背景图 URL');
+        return;
+      }
+      localStorage.setItem('cyyNav_heroBg', url);
+      showBgPreview(url);
+      alert('✅ 背景图已保存！刷新首页查看效果');
+    }
+    
+    // 使用默认背景
+    function useDefaultBg() {
+      var defaultBg = 'linear-gradient(135deg, rgba(0,82,255,0.15) 0%, rgba(77,124,255,0.1) 50%, rgba(0,212,255,0.08) 100%)';
+      localStorage.setItem('cyyNav_heroBg', defaultBg);
+      document.getElementById('bgUrl').value = defaultBg;
+      showBgPreview(defaultBg);
+      alert('✅ 已使用默认背景图！刷新首页查看效果');
+    }
+    
+    // 清除背景图
+    function clearBg() {
+      if (confirm('确定要清除自定义背景图吗？')) {
+        localStorage.removeItem('cyyNav_heroBg');
+        document.getElementById('bgUrl').value = '';
+        document.getElementById('bgPreview').style.display = 'none';
+        document.getElementById('bgPreviewText').textContent = '点击"应用背景图"后显示预览';
+        alert('✅ 背景图已清除！刷新首页查看效果');
+      }
+    }
+    
+    // 应用预设背景
+    function applyPresetBg(type) {
+      if (presetBgs[type]) {
+        localStorage.setItem('cyyNav_heroBg', presetBgs[type]);
+        document.getElementById('bgUrl').value = presetBgs[type];
+        showBgPreview(presetBgs[type]);
+        alert('✅ 已应用预设背景！刷新首页查看效果');
+      }
+    }
+    
+    // 渲染书签列表
+    function renderBookmarkList() {
+      var list = document.getElementById('bookmarkList');
+      var search = document.getElementById('searchBookmarks').value.toLowerCase();
+      var filterCat = document.getElementById('filterCategory').value;
+      
+      var filtered = bookmarksData.filter(function(b) {
+        var matchSearch = !search || b.title.toLowerCase().includes(search) || b.url.toLowerCase().includes(search);
+        var matchCat = !filterCat || b.category === filterCat;
+        return matchSearch && matchCat;
+      });
+      
+      if (filtered.length === 0) {
+        list.innerHTML = '<p style="text-align:center;padding:20px;color:#94a3b8">暂无书签</p>';
+        return;
+      }
+      
+      var html = '';
+      filtered.forEach(function(b, i) {
+        html += '<div class="bookmark-item">';
+        html += '<img src="https://www.google.com/s2/favicons?domain=' + b.domain + '&sz=64" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230052FF%22 stroke-width=%222%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22/></svg>\'">';
+        html += '<div class="bookmark-info"><div class="bookmark-title">' + b.title + '</div><div class="bookmark-url">' + b.url + '</div></div>';
+        html += '<div class="bookmark-actions">';
+        html += '<button class="btn btn-danger btn-sm" onclick="deleteBookmark(' + i + ')">删除</button>';
+        html += '</div></div>';
+      });
+      list.innerHTML = html;
+    }
+    
+    // 过滤书签
+    function filterBookmarks() {
+      renderBookmarkList();
+    }
+    
+    // 新增书签
+    function addBookmark() {
+      var title = document.getElementById('newTitle').value.trim();
+      var url = document.getElementById('newUrl').value.trim();
+      var category = document.getElementById('newCategory').value;
+      var tagsStr = document.getElementById('newTags').value.trim();
+      
+      if (!title || !url) {
+        alert('请填写网站名称和网址');
+        return;
+      }
+      
+      // 提取域名
+      var domain = '';
+      try {
+        domain = new URL(url).hostname;
+      } catch(e) {}
+      
+      var tags = tagsStr ? tagsStr.split(',').map(function(t) { return t.trim(); }) : [];
+      
+      var newBook = {title: title, url: url, domain: domain, category: category, tags: tags, logo: 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64'};
+      bookmarksData.push(newBook);
+      localStorage.setItem('cyyNav_bookmarks', JSON.stringify(bookmarksData));
+      
+      // 清空表单
+      document.getElementById('newTitle').value = '';
+      document.getElementById('newUrl').value = '';
+      document.getElementById('newTags').value = '';
+      
+      renderBookmarkList();
+      alert('✅ 书签添加成功！');
+    }
+    
+    // 删除书签
+    function deleteBookmark(index) {
+      if (confirm('确定要删除这条书签吗？')) {
+        bookmarksData.splice(index, 1);
+        localStorage.setItem('cyyNav_bookmarks', JSON.stringify(bookmarksData));
+        renderBookmarkList();
+        alert('✅ 书签已删除');
+      }
+    }
+  </script>
+</body>
+</html>
