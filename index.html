@@ -108,7 +108,7 @@ var categoryNav=document.getElementById("categoryNav"),mainContent=document.getE
 (function(){var p=new URLSearchParams(location.search);if(p.get("add")==="1"){var u=p.get("url")||"",t=p.get("title")||"";if(u)openAddModal(u,t);history.replaceState(null,"",location.pathname)}})();
 
 // 提取 URL（支持多种拖拽格式）
-function extractUrl(dt){var url="";var types=Array.from(dt.types||[]);if(types.indexOf&&(types.indexOf("text/uri-list")>-1||types.indexOf("text/x-moz-url")>-1)){try{url=dt.getData("text/uri-list")||dt.getData("text/x-moz-url")}catch(e){}}if(url)url=url.split("\n")[0].split("#")[0].trim();if(!url||!url.startsWith("http")){try{url=dt.getData("text/plain")}catch(e){}url=(url||"").trim()}if(url&&!url.startsWith("http")&&!url.startsWith("https"))url="";return url}
+function extractUrl(dt){var url="";try{url=dt.getData("text/plain")||""}catch(e){url=""}url=url.trim();if(url&&!url.startsWith("http")&&!url.startsWith("https"))url="";if(!url){try{var u=dt.getData("text/uri-list")||"";if(u)url=u.split("\n")[0].split("#")[0].trim()}catch(e){}}return url}
 
 // 外部拖拽放下事件
 document.addEventListener("dragover",function(e){e.preventDefault()});
