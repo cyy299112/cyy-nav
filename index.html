@@ -24,9 +24,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .category-item span{font-weight:500}
 .category-count{margin-left:auto;font-size:12px;color:#94a3b8}
 .main{margin-left:240px}
-.hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:60px 40px;text-align:center;color:#fff}
+.hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:60px 40px;text-align:center;color:#fff;position:relative}
 .hero h1{font-size:32px;font-weight:700;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
 .hero p{font-size:14px;opacity:0.9;margin-bottom:24px}
+.hero-actions{display:flex;justify-content:center;gap:12px;margin-top:16px}
+.hero-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#fff;color:#667eea;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.2)}
+.hero-btn svg{width:18px;height:18px}
 .search-wrapper{display:flex;justify-content:center}
 .search-box{display:flex;align-items:center;background:#fff;border-radius:12px;padding:4px 4px 4px 16px;width:100%;max-width:560px;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
 .search-box input{border:none;background:none;outline:none;flex:1;font-size:14px;padding:10px 0;color:#333}
@@ -49,9 +53,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 .hint{text-align:center;color:#94a3b8;font-size:12px;padding:8px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
+/* 模态框 */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:420px;transform:scale(0.9);transition:transform .3s}
+.modal.show{transform:scale(1)}
+.modal-title{font-size:18px;font-weight:600;color:#1e293b;margin-bottom:4px}
+.modal-subtitle{font-size:12px;color:#94a3b8;margin-bottom:16px;word-break:break-all}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;color:#64748B;margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box}
+.form-group input:focus,.form-group select:focus{border-color:#0052FF}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-btn{flex:1;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+.modal-btn-cancel{background:#f1f5f9;color:#64748B}
+.modal-btn-cancel:hover{background:#e2e8f0}
+.modal-btn-confirm{background:linear-gradient(135deg,#0052FF,#4D7CFF);color:#fff}
+.modal-btn-confirm:hover{opacity:0.9}
 </style>
 </head>
 <body>
+<!-- 添加模态框 -->
+<div class="modal-overlay" id="addModal">
+<div class="modal">
+<div class="modal-title">添加书签</div>
+<div class="modal-subtitle" id="addUrlDisplay"></div>
+<div class="form-group">
+<label>网址</label>
+<input type="text" id="addUrl" placeholder="https://...">
+</div>
+<div class="form-group">
+<label>名称</label>
+<input type="text" id="addTitle" placeholder="输入名称">
+</div>
+<div class="form-group">
+<label>分类</label>
+<select id="addCategory">
+<option value="AI对话">AI对话</option>
+<option value="AI绘画">AI绘画</option>
+<option value="AI应用">AI应用</option>
+<option value="设计素材">设计素材</option>
+<option value="设计工具">设计工具</option>
+<option value="效率工具">效率工具</option>
+<option value="数据分析">数据分析</option>
+<option value="常用工具">常用工具</option>
+<option value="企业内部">企业内部</option>
+<option value="学习资源">学习资源</option>
+<option value="参考导航">参考导航</option>
+<option value="其他">其他</option>
+</select>
+</div>
+<div class="modal-actions">
+<button class="modal-btn modal-btn-cancel" onclick="closeAddModal()">取消</button>
+<button class="modal-btn modal-btn-confirm" onclick="confirmAdd()">保存</button>
+</div>
+</div>
+</div>
+
 <aside class="sidebar">
 <div class="sidebar-header">
 <a href="#" class="logo" onclick="location.reload();return false">
@@ -94,6 +152,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-s
 <input type="text" id="search" placeholder="搜索网站、工具、资源...">
 <button class="search-btn">搜索</button>
 </div>
+</div>
+<div class="hero-actions">
+<button class="hero-btn" onclick="openAddModal('', '')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+添加书签
+</button>
 </div>
 </div>
 <div class="main-content">
@@ -1235,6 +1299,7 @@ var CAT_ORDER = ["AI\u5bf9\u8bdd", "AI\u7ed8\u753b", "AI\u5e94\u7528", "\u8bbe\u
 var currentCat = 'all';
 var draggedEl = null;
 var cardOrder = JSON.parse(localStorage.getItem('cyyNav_cardOrder') || '{}');
+var customBookmarks = JSON.parse(localStorage.getItem('cyyNav_customBookmarks') || '[]');
 
 function showToast(msg) {
     var t = document.getElementById('toast');
@@ -1247,15 +1312,97 @@ function saveOrder() {
     localStorage.setItem('cyyNav_cardOrder', JSON.stringify(cardOrder));
 }
 
-// 页面加载时应用保存的顺序
+function openAddModal(url, title) {
+    var modal = document.getElementById('addModal');
+    document.getElementById('addUrl').value = url || '';
+    document.getElementById('addTitle').value = title || '';
+    document.getElementById('addCategory').value = '其他';
+    modal.classList.add('show');
+    setTimeout(function() { document.getElementById('addTitle').focus(); }, 100);
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').classList.remove('show');
+}
+
+function confirmAdd() {
+    var url = document.getElementById('addUrl').value.trim();
+    var title = document.getElementById('addTitle').value.trim();
+    var category = document.getElementById('addCategory').value;
+    
+    if (!url) { showToast('请输入网址'); return; }
+    if (!url.startsWith('http')) { showToast('请输入有效的网址'); return; }
+    if (!title) { showToast('请输入名称'); return; }
+    
+    // 检查是否已存在
+    var exists = customBookmarks.some(function(b) { return b.url === url; });
+    if (exists) { showToast('该网址已存在'); return; }
+    
+    var domain = url.replace('https://','').replace('http://','').split('/')[0];
+    var logo = 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=64';
+    
+    var newBookmark = {
+        title: title,
+        url: url,
+        logo: logo,
+        category: category,
+        isCustom: true,
+        addedAt: Date.now()
+    };
+    
+    customBookmarks.unshift(newBookmark);
+    localStorage.setItem('cyyNav_customBookmarks', JSON.stringify(customBookmarks));
+    
+    closeAddModal();
+    showToast('已添加到「' + category + '」');
+    
+    // 添加到当前页面
+    addCardToPage(newBookmark);
+}
+
+function addCardToPage(bm) {
+    var grid = document.querySelector('.cards-grid[data-cat="' + bm.category + '"]');
+    if (!grid) return;
+    
+    var card = document.createElement('a');
+    card.href = bm.url;
+    card.target = '_blank';
+    card.className = 'card';
+    card.draggable = true;
+    card.dataset.url = bm.url;
+    card.dataset.cat = bm.category;
+    card.innerHTML = '<div class="drag-handle">☰</div><img class="card-logo" src="' + bm.logo + '" alt="" onerror="this.style.display='none'"><div class="card-info"><div class="card-name">' + bm.title + '</div><div class="card-tags"><span class="card-tag"></span></div></div>';
+    
+    // 绑定拖拽事件
+    card.addEventListener('dragstart', function(e) { onDragStart(e, card); });
+    card.addEventListener('dragend', onDragEnd);
+    card.addEventListener('dragover', onDragOver);
+    card.addEventListener('dragleave', onDragLeave);
+    card.addEventListener('drop', onDrop);
+    
+    grid.insertBefore(card, grid.firstChild);
+    
+    // 更新分类计数
+    var catItem = document.querySelector('.category-item[data-cat="' + bm.category + '"]');
+    if (catItem) {
+        var countEl = catItem.querySelector('.category-count');
+        var count = parseInt(countEl.textContent) + 1;
+        countEl.textContent = count;
+    }
+    
+    var totalItem = document.querySelector('.category-item[data-cat="all"] .category-count');
+    if (totalItem) {
+        var total = parseInt(totalItem.textContent) + 1;
+        totalItem.textContent = total;
+    }
+}
+
 function applySavedOrder() {
     Object.keys(cardOrder).forEach(function(cat) {
         var grid = document.querySelector('.cards-grid[data-cat="' + cat + '"]');
         if (!grid) return;
         var urls = cardOrder[cat];
         if (!urls || !Array.isArray(urls)) return;
-        
-        // 按保存的顺序重新排列卡片
         urls.forEach(function(url) {
             var card = grid.querySelector('[data-url="' + url + '"]');
             if (card) grid.appendChild(card);
@@ -1282,7 +1429,6 @@ function filterCards() {
     });
 }
 
-// 拖拽排序
 function onDragStart(e, card) {
     draggedEl = card;
     card.classList.add('dragging');
@@ -1300,9 +1446,7 @@ function onDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     var card = e.target.closest('.card');
-    if (card && card !== draggedEl) {
-        card.classList.add('drag-over');
-    }
+    if (card && card !== draggedEl) { card.classList.add('drag-over'); }
 }
 
 function onDragLeave(e) {
@@ -1320,7 +1464,6 @@ function onDrop(e) {
     var cat = grid.dataset.cat;
     if (!cat) return;
     
-    // 获取当前顺序
     var urls = [];
     grid.querySelectorAll('.card').forEach(function(c) { urls.push(c.dataset.url); });
     
@@ -1333,16 +1476,14 @@ function onDrop(e) {
         cardOrder[cat] = urls;
         saveOrder();
         
-        // 重新排序 DOM
         urls.forEach(function(url) {
             var c = grid.querySelector('[data-url="' + url + '"]');
             if (c) grid.appendChild(c);
         });
-        showToast('顺序已保存，刷新后保持');
+        showToast('顺序已保存');
     }
 }
 
-// 绑定拖拽事件
 document.querySelectorAll('.card').forEach(function(card) {
     card.addEventListener('dragstart', function(e) { onDragStart(e, card); });
     card.addEventListener('dragend', onDragEnd);
@@ -1351,17 +1492,12 @@ document.querySelectorAll('.card').forEach(function(card) {
     card.addEventListener('drop', onDrop);
 });
 
-// 侧边栏点击
 document.querySelectorAll('.category-item').forEach(function(el) {
-    el.addEventListener('click', function() {
-        selectCategory(el.dataset.cat || 'all');
-    });
+    el.addEventListener('click', function() { selectCategory(el.dataset.cat || 'all'); });
 });
 
-// 搜索
 document.getElementById('search').addEventListener('input', filterCards);
 
-// 初始化 - 先应用保存的顺序，再设置高亮
 document.querySelector('.category-item[data-cat="all"]')?.classList.add('active');
 applySavedOrder();
 
